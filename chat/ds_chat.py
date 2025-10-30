@@ -1,4 +1,5 @@
 import os
+
 from dotenv import load_dotenv
 
 load_dotenv(override=True)
@@ -33,32 +34,19 @@ agent = create_agent(
 
 state = [
     {"role": "assistant", "content": "承运商应付月结审核成功发送数据生产分摊数据处理，在分摊数据处理页面点击生成分摊账单，"
-                                    "即发送消息，后台任务监听到该消息后执行生成分摊账单任务，最后保存分摊账单"}
+                                     "即发送消息，后台任务监听到该消息后执行生成分摊账单任务，最后保存分摊账单"}
 ]
+
+
 # state.append({"role": "user", "content": "派件费是如何产生的？"})
-state.append({"role": "user", "content": "你还挺专业嘛"})
-# Run the agent
-# response = agent.invoke(
-#     {"messages": state}
-# )
-# answer = response.get('messages')[-1]
-# print(answer.content)
+# state.append({"role": "user", "content": "你还挺专业嘛"})
 
-# for chunk in agent.stream(
-#     {"messages": state},
-#     stream_mode="messages",
-# ):
-#     # print(f"chunk: {chunk}")
-#     for step, data in chunk.items():
-#         print(f"step: {step}")
-#         print(f"content: {data['messages'][-1].content_blocks}")
-
-for token, metadata in agent.stream(
-    {"messages": state},
-    stream_mode="messages",
-):
-    for content in token.content_blocks:
-        if content:
-            print(f"{content['text']}", end="")
-    # print(f"content: {token.content_blocks}")
-    # print(f"content: {token.content_blocks[0].text}")
+def call_llm(input):
+    state.append({"role": "user", "content": input})
+    for token, metadata in agent.stream(
+            {"messages": state},
+            stream_mode="messages",
+    ):
+        for content in token.content_blocks:
+            if content:
+                yield content['text']
