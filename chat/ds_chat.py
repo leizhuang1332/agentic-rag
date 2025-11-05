@@ -50,3 +50,6 @@ def call_llm(input):
         for content in token.content_blocks:
             if content:
                 yield content['text']
+
+if __name__ == '__main__':
+    call_llm("派件费是如何产生的？")

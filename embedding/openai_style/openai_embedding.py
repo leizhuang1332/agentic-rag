@@ -1,22 +1,23 @@
-import os
+from utils_d.common import get_vector_store
 
-from langchain_openai import OpenAIEmbeddings
 
-from dotenv import load_dotenv
+def embed_save(texts):
+    batch_size = 64  # 匹配 OpenAI 接口限制
+    for i in range(0, len(texts), batch_size):
+        batch_texts = texts[i:i + batch_size]  # 拆分批次
+        get_vector_store().add_texts(batch_texts)  # 逐批添加
+        print(f"已完成第 {i // batch_size + 1} 批文本嵌入，共处理 {len(batch_texts)} 条")
+    print(f"所有文本（共 {len(texts)} 条）已全部嵌入并保存到 Milvus")
 
-load_dotenv(override=True)
+def embed_query(text):
+    # Use the vectorstore as a retriever
+    retriever = get_vector_store().as_retriever()
 
-ZHIPUAI_API_KEY = os.getenv("ZHIPUAI_API_KEY")
-ZHIPUAI_EMBEDDING = os.getenv("ZHIPUAI_EMBEDDING")
-ZHIPUAI_BASE_URL = os.getenv("ZHIPUAI_BASE_URL")
+    # Retrieve the most similar text
+    retrieved_documents = retriever.invoke(text)
 
-embeddings = OpenAIEmbeddings(
-    api_key=ZHIPUAI_API_KEY,
-    model=ZHIPUAI_EMBEDDING,
-    base_url=ZHIPUAI_BASE_URL,
-    dimensions=256
-)
+    # show the retrieved document's content
+    return retrieved_documents
 
 if __name__ == '__main__':
-    query = embeddings.embed_query("哈哈哈")
-    print(query)
+    embed_save("haha")
