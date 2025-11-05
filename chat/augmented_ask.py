@@ -1,3 +1,5 @@
+import asyncio
+
 from chat.model_ds import getModel
 from utils_d.common import get_vector_store
 
@@ -26,20 +28,20 @@ def call_llm_with_rag(query, vectorstore, llm_model):
     完整的RAG流程：检索 + 提示词构建 + 调用大模型
     """
     # 1. 检索相关文档
-    retrieved_docs = vectorstore.similarity_search(query, k=3)
-
+    retrieved_docs_score = vectorstore.similarity_search_with_score(query, k=5)
+    retrieved_docs,score = zip(*retrieved_docs_score)
     # 2. 构建提示词
     prompt = build_rag_prompt(query, retrieved_docs)
 
     # 3. 调用大模型
-    response = llm_model.invoke(prompt)
-
-    return response.content
-
+    response = llm_model.stream(prompt)
+    for token in response:
+        yield token.content
 
 if __name__ == '__main__':
     # 使用示例
-    query = "java代码的命名风格是怎么样的？"
-    result = call_llm_with_rag(query, get_vector_store(), getModel())
+    query = "单元测试？"
     print("用户提问：" + query)
-    print("模型最终回答：" + result)
+    result = call_llm_with_rag(query, get_vector_store(), getModel())
+    for chunk in result:
+        print(chunk, end="", flush=True)

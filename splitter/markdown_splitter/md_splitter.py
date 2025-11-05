@@ -19,8 +19,8 @@ def split(markdown_document):
 
 
 def split_chunk(md_header_splits):
-    chunk_size = 250
-    chunk_overlap = 30
+    chunk_size = 150
+    chunk_overlap = 50
     text_splitter = RecursiveCharacterTextSplitter(
         chunk_size=chunk_size, chunk_overlap=chunk_overlap
     )

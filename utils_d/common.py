@@ -14,7 +14,7 @@ embeddings = OpenAIEmbeddings(
     api_key=ZHIPUAI_API_KEY,
     model=ZHIPUAI_EMBEDDING,
     base_url=ZHIPUAI_BASE_URL,
-    dimensions=256
+    dimensions=1024
 )
 
 
